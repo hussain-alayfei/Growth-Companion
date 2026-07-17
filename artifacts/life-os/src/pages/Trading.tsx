@@ -22,10 +22,17 @@ import {
   ChevronDown,
   Loader2,
   ClipboardList,
+  Search,
 } from "lucide-react";
 import { useState, useMemo } from "react";
 import { motion, AnimatePresence } from "framer-motion";
 import { MarkdownMessage } from "@/components/ui/markdown-message";
+import {
+  MARKETS,
+  getStockMarket,
+  marketLabel,
+  type MarketId,
+} from "@/lib/markets";
 
 const generateSparkline = (start: number, end: number) => {
   const data = [];
@@ -152,11 +159,33 @@ export default function Trading() {
   const [confirmOpen, setConfirmOpen] = useState(false);
   const [lastFeedback, setLastFeedback] = useState<string | null>(null);
   const [sessionReview, setSessionReview] = useState<SessionReview | null>(null);
+  const [marketQuery, setMarketQuery] = useState("");
+  const [marketFilter, setMarketFilter] = useState<MarketId | "all">("all");
 
   const isPositive = (portfolio?.totalGainLoss || 0) >= 0;
   const allSymbols = useMemo(() => stocks?.map((s) => s.symbol) || [], [stocks]);
   const selectedStock = useMemo(() => stocks?.find((s) => s.symbol === selectedSymbol), [stocks, selectedSymbol]);
   const candleData = useMemo(() => (selectedStock ? generateOHLC(selectedStock.price) : []), [selectedStock]);
+
+  const filteredStocks = useMemo(() => {
+    if (!stocks) return [];
+    const q = marketQuery.trim().toLowerCase();
+    return stocks.filter((stock) => {
+      const market = getStockMarket(stock.symbol);
+      if (marketFilter !== "all" && market !== marketFilter) return false;
+      if (!q) return true;
+      const label = marketLabel(market);
+      const marketMeta = MARKETS.find((m) => m.id === market);
+      const terms = marketMeta?.searchTerms ?? [];
+      if (terms.some((t) => t.toLowerCase() === q || q.includes(t.toLowerCase()) || t.toLowerCase().includes(q))) {
+        return true;
+      }
+      const haystack = [stock.symbol, stock.name, stock.sector, stock.description ?? "", label]
+        .join(" ")
+        .toLowerCase();
+      return haystack.includes(q);
+    });
+  }, [stocks, marketQuery, marketFilter]);
 
   const tabs: { key: Tab; label: string }[] = [
     { key: "portfolio", label: "حيازاتي" },
@@ -356,13 +385,53 @@ export default function Trading() {
 
             {activeTab === "market" && (
               <>
+                <div className="flex flex-col gap-3">
+                  <div className="relative">
+                    <Search className="absolute right-3 top-1/2 -translate-y-1/2 w-4 h-4 text-muted-foreground pointer-events-none" />
+                    <input
+                      type="search"
+                      value={marketQuery}
+                      onChange={(e) => setMarketQuery(e.target.value)}
+                      placeholder="ابحث عن شركة أو سوق (سعودي، عالمي، عربي...)"
+                      className="w-full bg-secondary border border-card-border rounded-2xl pr-10 pl-4 py-3 text-sm outline-none focus:ring-2 focus:ring-primary/40"
+                      style={{ direction: "rtl" }}
+                    />
+                  </div>
+                  <div className="flex gap-2 overflow-x-auto no-scrollbar pb-0.5">
+                    {MARKETS.map((m) => (
+                      <button
+                        key={m.id}
+                        type="button"
+                        onClick={() => setMarketFilter(m.id)}
+                        className={`shrink-0 px-3.5 py-1.5 rounded-full text-xs font-bold transition-colors ${
+                          marketFilter === m.id
+                            ? "bg-primary text-white"
+                            : "bg-secondary text-muted-foreground"
+                        }`}
+                      >
+                        {m.label}
+                      </button>
+                    ))}
+                  </div>
+                  <p className="text-[11px] text-muted-foreground">
+                    {filteredStocks.length} شركة
+                    {marketFilter !== "all" ? ` · ${marketLabel(marketFilter)}` : ""}
+                    {marketQuery.trim() ? ` · نتائج «${marketQuery.trim()}»` : ""}
+                  </p>
+                </div>
+
                 {loadingStocks ? (
                   <div className="flex justify-center py-10">
                     <Lumi size={40} emotion="idle" />
                   </div>
+                ) : filteredStocks.length === 0 ? (
+                  <div className="text-center py-10 text-muted-foreground text-sm">
+                    لا توجد نتائج. جرّب سوقاً آخر أو اسم شركة مختلف.
+                  </div>
                 ) : (
-                  stocks?.map((stock) => {
+                  filteredStocks.map((stock) => {
                     const pos = stock.change >= 0;
+                    const market = getStockMarket(stock.symbol);
                     return (
                       <button
                         key={stock.symbol}
@@ -370,13 +439,18 @@ export default function Trading() {
                           setSelectedSymbol(stock.symbol);
                           setActiveTab("trade");
                         }}
-                        className="bg-card border border-card-border p-4 rounded-2xl flex items-center justify-between gap-3 text-right"
+                        className="bg-card border border-card-border p-4 rounded-2xl flex items-center gap-3 text-right w-full min-w-0"
                       >
-                        <div className="w-[65px] shrink-0">
-                          <h3 className="font-bold">{stock.symbol}</h3>
-                          <p className="text-[10px] text-muted-foreground truncate">{stock.name}</p>
+                        <div className="min-w-0 flex-1 text-right">
+                          <div className="flex items-center gap-2 justify-start flex-wrap">
+                            <h3 className="font-bold">{stock.symbol}</h3>
+                            <span className="text-[10px] px-2 py-0.5 rounded-full bg-secondary text-muted-foreground font-medium">
+                              {marketLabel(market)}
+                            </span>
+                          </div>
+                          <p className="text-[11px] text-muted-foreground truncate mt-0.5">{stock.name}</p>
                         </div>
-                        <div className="flex-1 h-10 opacity-60">
+                        <div className="w-16 h-10 opacity-60 shrink-0">
                           <ResponsiveContainer width="100%" height="100%">
                             <LineChart data={generateSparkline(stock.price - stock.change, stock.price)}>
                               <YAxis domain={["dataMin", "dataMax"]} hide />
@@ -384,7 +458,7 @@ export default function Trading() {
                             </LineChart>
                           </ResponsiveContainer>
                         </div>
-                        <div className="text-right w-[72px] shrink-0">
+                        <div className="text-left w-[76px] shrink-0">
                           <div className="font-bold text-sm">${stock.price.toFixed(2)}</div>
                           <div className={`text-xs font-medium ${pos ? "text-emerald-500" : "text-rose-500"}`}>
                             {pos ? "+" : ""}
