@@ -2,21 +2,29 @@ openapi: 3.1.0
 info:
   # Do not change the title, if the title changes, the import paths will be broken
   title: Api
-  version: 0.1.0
-  description: API specification
+  version: 0.2.0
+  description: TradeUP API — Arabic trading education simulator with AI coach
 servers:
   - url: /api
     description: Base API path
 tags:
   - name: health
     description: Health operations
+  - name: trading
+    description: Stock trading simulator and AI coach
+  - name: gamification
+    description: Streaks, badges, achievements
+  - name: dashboard
+    description: Dashboard summaries and insights
+  - name: persona
+    description: Cartoon persona and coaching
+
 paths:
   /healthz:
     get:
       operationId: healthCheck
       tags: [health]
       summary: Health check
-      description: Returns server health status
       responses:
         "200":
           description: Healthy
@@ -24,13 +32,960 @@ paths:
             application/json:
               schema:
                 $ref: "#/components/schemas/HealthStatus"
+
+  # ── TRADING ──────────────────────────────────────────────────────────
+  /trading/portfolio:
+    get:
+      operationId: getPortfolio
+      tags: [trading]
+      summary: Get user's virtual portfolio
+      responses:
+        "200":
+          description: Portfolio
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/Portfolio"
+
+  /trading/stocks:
+    get:
+      operationId: getStocks
+      tags: [trading]
+      summary: List available stocks for trading
+      responses:
+        "200":
+          description: Stock list
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: "#/components/schemas/Stock"
+
+  /trading/stocks/{symbol}/history/{period}:
+    get:
+      operationId: getStockHistory
+      tags: [trading]
+      summary: Get price history for a stock
+      parameters:
+        - name: symbol
+          in: path
+          required: true
+          schema:
+            type: string
+        - name: period
+          in: path
+          required: true
+          schema:
+            type: string
+            enum: [1d, 1w, 1m, 3m, 1y]
+      responses:
+        "200":
+          description: Price history
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: "#/components/schemas/PricePoint"
+
+  /trading/stocks/{symbol}/analyze:
+    post:
+      operationId: analyzeStock
+      tags: [trading]
+      summary: Educational AI brief on a stock (not a recommendation)
+      parameters:
+        - name: symbol
+          in: path
+          required: true
+          schema:
+            type: string
+      responses:
+        "200":
+          description: Stock analysis brief
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/StockAnalysis"
+
+  /trading/orders:
+    get:
+      operationId: getOrders
+      tags: [trading]
+      summary: Get trade history
+      responses:
+        "200":
+          description: Order history
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: "#/components/schemas/Order"
+    post:
+      operationId: placeOrder
+      tags: [trading]
+      summary: Place a buy or sell order (use confirmed=true after high-risk preview)
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/OrderInput"
+      responses:
+        "201":
+          description: Order placed with AI coaching feedback
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/OrderResult"
+
+  /trading/orders/preview:
+    post:
+      operationId: previewOrder
+      tags: [trading]
+      summary: Pre-trade AI coach review; may require confirmation
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/OrderPreviewInput"
+      responses:
+        "200":
+          description: Preview with risk and coach feedback
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/OrderPreview"
+
+  /trading/coach/advice:
+    post:
+      operationId: getCoachAdvice
+      tags: [trading]
+      summary: Ask the AI trading coach a question
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/CoachQuery"
+      responses:
+        "200":
+          description: Coach response
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/CoachResponse"
+
+  /trading/sessions/review:
+    post:
+      operationId: reviewTradingSession
+      tags: [trading]
+      summary: Calm post-session review aligned with coach philosophy
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/SessionReviewInput"
+      responses:
+        "200":
+          description: Session review
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/SessionReview"
+
+  /trading/alerts:
+    get:
+      operationId: getTradingAlerts
+      tags: [trading]
+      summary: Get smart trading alerts and notifications
+      responses:
+        "200":
+          description: Alerts
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: "#/components/schemas/TradingAlert"
+
+  /trading/insights:
+    get:
+      operationId: getTradingInsights
+      tags: [trading]
+      summary: Behavioural insights about trading patterns
+      responses:
+        "200":
+          description: Insights
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/TradingInsights"
+
+  # ── GAMIFICATION ───────────────────────────────────────────────────
+  /gamification/profile:
+    get:
+      operationId: getUserProfile
+      tags: [gamification]
+      summary: Get user's gamification profile (XP, level, streak)
+      responses:
+        "200":
+          description: Profile
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/UserProfile"
+
+  /gamification/coach:
+    patch:
+      operationId: updateSelectedCoach
+      tags: [gamification]
+      summary: Select one philosophy coach persona
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/SelectedCoachPatch"
+      responses:
+        "200":
+          description: Updated coach
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/SelectedCoachResult"
+
+  /gamification/badges:
+    get:
+      operationId: getBadges
+      tags: [gamification]
+      summary: Get all badges (earned and locked)
+      responses:
+        "200":
+          description: Badges
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: "#/components/schemas/Badge"
+
+  /gamification/achievements:
+    get:
+      operationId: getAchievements
+      tags: [gamification]
+      summary: Get milestone achievements
+      responses:
+        "200":
+          description: Achievements
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: "#/components/schemas/Achievement"
+
+  /gamification/streak:
+    get:
+      operationId: getStreak
+      tags: [gamification]
+      summary: Get current and longest streak data
+      responses:
+        "200":
+          description: Streak data
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/StreakData"
+
+  /gamification/leaderboard:
+    get:
+      operationId: getLeaderboard
+      tags: [gamification]
+      summary: Weekly consistency leaderboard
+      responses:
+        "200":
+          description: Leaderboard entries
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: "#/components/schemas/LeaderboardEntry"
+
+  # ── DASHBOARD ──────────────────────────────────────────────────────
+  /dashboard/summary:
+    get:
+      operationId: getDashboardSummary
+      tags: [dashboard]
+      summary: Full dashboard overview (trades, streak, portfolio)
+      responses:
+        "200":
+          description: Dashboard summary
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/DashboardSummary"
+
+  /dashboard/activity:
+    get:
+      operationId: getRecentActivity
+      tags: [dashboard]
+      summary: Recent activity feed (trades, badges, milestones)
+      parameters:
+        - name: limit
+          in: query
+          schema:
+            type: integer
+            default: 10
+      responses:
+        "200":
+          description: Activity feed
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: "#/components/schemas/ActivityItem"
+
+  /dashboard/insights:
+    get:
+      operationId: getBehavioralInsights
+      tags: [dashboard]
+      summary: Behavioral patterns and growth insights
+      responses:
+        "200":
+          description: Insights
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/BehavioralInsights"
+
+  # ── PERSONA ────────────────────────────────────────────────────────
+  /persona/message:
+    get:
+      operationId: getPersonaMessage
+      tags: [persona]
+      summary: Get a motivational message from the cartoon persona
+      parameters:
+        - name: context
+          in: query
+          schema:
+            type: string
+            enum: [morning, completion, streak, trading, idle]
+      responses:
+        "200":
+          description: Persona message
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/PersonaMessage"
+
+  /persona/notifications:
+    get:
+      operationId: getPersonaNotifications
+      tags: [persona]
+      summary: Pending persona notifications
+      responses:
+        "200":
+          description: Notifications
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: "#/components/schemas/PersonaNotification"
+
 components:
   schemas:
     HealthStatus:
       type: object
+      required: [status]
       properties:
         status:
           type: string
-      required:
-        - status
 
+    Portfolio:
+      type: object
+      required: [cashBalance, totalValue, totalGainLoss, totalGainLossPercent, holdings]
+      properties:
+        cashBalance:
+          type: number
+        totalValue:
+          type: number
+        totalGainLoss:
+          type: number
+        totalGainLossPercent:
+          type: number
+        dayGainLoss:
+          type: number
+        dayGainLossPercent:
+          type: number
+        holdings:
+          type: array
+          items:
+            $ref: "#/components/schemas/Holding"
+
+    Holding:
+      type: object
+      required: [symbol, name, shares, avgCost, currentPrice, totalValue, gainLoss, gainLossPercent]
+      properties:
+        symbol:
+          type: string
+        name:
+          type: string
+        shares:
+          type: number
+        avgCost:
+          type: number
+        currentPrice:
+          type: number
+        totalValue:
+          type: number
+        gainLoss:
+          type: number
+        gainLossPercent:
+          type: number
+        sector:
+          type: string
+
+    Stock:
+      type: object
+      required: [symbol, name, price, change, changePercent, sector]
+      properties:
+        symbol:
+          type: string
+        name:
+          type: string
+        price:
+          type: number
+        change:
+          type: number
+        changePercent:
+          type: number
+        sector:
+          type: string
+        marketCap:
+          type: string
+        description:
+          type: ["string", "null"]
+        aiRating:
+          type: ["string", "null"]
+          enum: [strong_buy, buy, hold, sell, strong_sell, null]
+
+    PricePoint:
+      type: object
+      required: [date, open, high, low, close, volume]
+      properties:
+        date:
+          type: string
+        open:
+          type: number
+        high:
+          type: number
+        low:
+          type: number
+        close:
+          type: number
+        volume:
+          type: integer
+
+    Order:
+      type: object
+      required: [id, symbol, type, shares, price, total, executedAt]
+      properties:
+        id:
+          type: integer
+        symbol:
+          type: string
+        type:
+          type: string
+          enum: [buy, sell]
+        shares:
+          type: number
+        price:
+          type: number
+        total:
+          type: number
+        notes:
+          type: ["string", "null"]
+        executedAt:
+          type: string
+
+    OrderInput:
+      type: object
+      required: [symbol, type, shares]
+      properties:
+        symbol:
+          type: string
+        type:
+          type: string
+          enum: [buy, sell]
+        shares:
+          type: number
+        notes:
+          type: string
+        confirmed:
+          type: boolean
+          description: Set true after acknowledging high-risk preview confirmation
+
+    OrderPreviewInput:
+      type: object
+      required: [symbol, type, shares]
+      properties:
+        symbol:
+          type: string
+        type:
+          type: string
+          enum: [buy, sell]
+        shares:
+          type: number
+
+    OrderPreview:
+      type: object
+      required: [riskLevel, requiresConfirm, coachFeedback, alignmentScore, philosophyNotes, questionsForUser]
+      properties:
+        riskLevel:
+          type: string
+          enum: [low, moderate, high, extreme]
+        requiresConfirm:
+          type: boolean
+        warning:
+          type: ["string", "null"]
+        coachFeedback:
+          type: string
+        alignmentScore:
+          type: number
+        philosophyNotes:
+          type: array
+          items:
+            type: string
+        questionsForUser:
+          type: array
+          items:
+            type: string
+        estimatedTotal:
+          type: number
+        tradePercentOfPortfolio:
+          type: number
+
+    OrderResult:
+      type: object
+      required: [order, portfolio, coachFeedback, riskLevel]
+      properties:
+        order:
+          $ref: "#/components/schemas/Order"
+        portfolio:
+          $ref: "#/components/schemas/Portfolio"
+        coachFeedback:
+          type: string
+        riskLevel:
+          type: string
+          enum: [low, moderate, high, extreme]
+        warning:
+          type: ["string", "null"]
+        xpGained:
+          type: integer
+
+    CoachHistoryMessage:
+      type: object
+      required: [role, content]
+      properties:
+        role:
+          type: string
+          enum: [user, assistant]
+        content:
+          type: string
+
+    CoachQuery:
+      type: object
+      required: [question]
+      properties:
+        question:
+          type: string
+          minLength: 1
+        history:
+          type: array
+          items:
+            $ref: "#/components/schemas/CoachHistoryMessage"
+        coachId:
+          type: string
+          enum: [value, growth, risk, technical]
+
+    CoachResponse:
+      type: object
+      required: [message, suggestions, personaEmotion]
+      properties:
+        message:
+          type: string
+        suggestions:
+          type: array
+          items:
+            type: string
+        personaEmotion:
+          type: string
+          enum: [thinking, excited, cautious, proud, teaching]
+        learnMore:
+          type: ["string", "null"]
+        refs:
+          type: array
+          items:
+            type: string
+
+    SessionReviewInput:
+      type: object
+      properties:
+        coachId:
+          type: string
+          enum: [value, growth, risk, technical]
+        limit:
+          type: integer
+          default: 20
+
+    SessionReview:
+      type: object
+      required: [summary, alignmentScore, whatWentWell, whatToImprove, nextPractice, personaEmotion]
+      properties:
+        summary:
+          type: string
+        alignmentScore:
+          type: number
+        whatWentWell:
+          type: array
+          items:
+            type: string
+        whatToImprove:
+          type: array
+          items:
+            type: string
+        nextPractice:
+          type: string
+        personaEmotion:
+          type: string
+          enum: [proud, thoughtful, cautious]
+
+    StockAnalysis:
+      type: object
+      required: [symbol, brief, keyPoints, risks, educationalNote]
+      properties:
+        symbol:
+          type: string
+        brief:
+          type: string
+        keyPoints:
+          type: array
+          items:
+            type: string
+        risks:
+          type: array
+          items:
+            type: string
+        educationalNote:
+          type: string
+
+    TradingAlert:
+      type: object
+      required: [id, type, symbol, message, severity, createdAt]
+      properties:
+        id:
+          type: integer
+        type:
+          type: string
+          enum: [opportunity, risk, pattern, milestone, reminder]
+        symbol:
+          type: ["string", "null"]
+        message:
+          type: string
+        severity:
+          type: string
+          enum: [info, warning, opportunity]
+        read:
+          type: boolean
+        createdAt:
+          type: string
+
+    TradingInsights:
+      type: object
+      required: [totalTrades, winRate, avgGainLoss, bestTrade, worstTrade, topSector, behaviorTips]
+      properties:
+        totalTrades:
+          type: integer
+        winRate:
+          type: number
+        avgGainLoss:
+          type: number
+        bestTrade:
+          type: ["string", "null"]
+        worstTrade:
+          type: ["string", "null"]
+        topSector:
+          type: ["string", "null"]
+        behaviorTips:
+          type: array
+          items:
+            type: string
+
+    UserProfile:
+      type: object
+      required: [username, level, xp, xpToNextLevel, currentStreak, longestStreak, totalTrades, selectedCoachId, joinedAt]
+      properties:
+        username:
+          type: string
+        avatarUrl:
+          type: ["string", "null"]
+        level:
+          type: integer
+        xp:
+          type: integer
+        xpToNextLevel:
+          type: integer
+        currentStreak:
+          type: integer
+        longestStreak:
+          type: integer
+        totalTrades:
+          type: integer
+        selectedCoachId:
+          type: string
+          enum: [value, growth, risk, technical]
+        personaName:
+          type: string
+        personaMood:
+          type: string
+          enum: [happy, excited, proud, sleepy, encouraging]
+        joinedAt:
+          type: string
+
+    SelectedCoachPatch:
+      type: object
+      required: [coachId]
+      properties:
+        coachId:
+          type: string
+          enum: [value, growth, risk, technical]
+
+    SelectedCoachResult:
+      type: object
+      required: [selectedCoachId]
+      properties:
+        selectedCoachId:
+          type: string
+          enum: [value, growth, risk, technical]
+
+    Badge:
+      type: object
+      required: [id, name, description, icon, category, earned]
+      properties:
+        id:
+          type: integer
+        name:
+          type: string
+        description:
+          type: string
+        icon:
+          type: string
+        category:
+          type: string
+          enum: [streak, completion, trading, reflection, milestone, special]
+        earned:
+          type: boolean
+        earnedAt:
+          type: ["string", "null"]
+        rarity:
+          type: string
+          enum: [common, rare, epic, legendary]
+
+    Achievement:
+      type: object
+      required: [id, title, description, icon, progress, target, completed]
+      properties:
+        id:
+          type: integer
+        title:
+          type: string
+        description:
+          type: string
+        icon:
+          type: string
+        progress:
+          type: integer
+        target:
+          type: integer
+        completed:
+          type: boolean
+        completedAt:
+          type: ["string", "null"]
+        xpReward:
+          type: integer
+
+    StreakData:
+      type: object
+      required: [currentStreak, longestStreak, lastActiveDate, weeklyHeatmap]
+      properties:
+        currentStreak:
+          type: integer
+        longestStreak:
+          type: integer
+        lastActiveDate:
+          type: string
+        weeklyHeatmap:
+          type: array
+          items:
+            $ref: "#/components/schemas/HeatmapDay"
+
+    HeatmapDay:
+      type: object
+      required: [date, completed, total, intensity]
+      properties:
+        date:
+          type: string
+        completed:
+          type: integer
+        total:
+          type: integer
+        intensity:
+          type: number
+
+    LeaderboardEntry:
+      type: object
+      required: [rank, username, streak, xp, level, isCurrentUser]
+      properties:
+        rank:
+          type: integer
+        username:
+          type: string
+        avatarUrl:
+          type: ["string", "null"]
+        streak:
+          type: integer
+        xp:
+          type: integer
+        level:
+          type: integer
+        isCurrentUser:
+          type: boolean
+
+    TradeStats:
+      type: object
+      required: [tradesToday, totalTrades, streakDays]
+      properties:
+        tradesToday:
+          type: integer
+        totalTrades:
+          type: integer
+        streakDays:
+          type: integer
+
+    DashboardSummary:
+      type: object
+      required: [tradeStats, streak, portfolioSnapshot, personaMessage, selectedCoachId]
+      properties:
+        tradeStats:
+          $ref: "#/components/schemas/TradeStats"
+        streak:
+          type: integer
+        portfolioSnapshot:
+          type: object
+          properties:
+            totalValue:
+              type: number
+            dayChange:
+              type: number
+            dayChangePercent:
+              type: number
+        personaMessage:
+          type: string
+        selectedCoachId:
+          type: string
+          enum: [value, growth, risk, technical]
+        upcomingMilestone:
+          type: ["string", "null"]
+        level:
+          type: integer
+        xp:
+          type: integer
+        xpToNextLevel:
+          type: integer
+
+    ActivityItem:
+      type: object
+      required: [id, type, title, description, xpGained, timestamp]
+      properties:
+        id:
+          type: integer
+        type:
+          type: string
+          enum: [trade_executed, badge_earned, streak_milestone, level_up]
+        title:
+          type: string
+        description:
+          type: string
+        xpGained:
+          type: integer
+        timestamp:
+          type: string
+        icon:
+          type: string
+
+    BehavioralInsights:
+      type: object
+      required: [strongestCategory, weakestCategory, bestDayOfWeek, peakHour, consistencyScore, trends, suggestions]
+      properties:
+        strongestCategory:
+          type: ["string", "null"]
+        weakestCategory:
+          type: ["string", "null"]
+        bestDayOfWeek:
+          type: ["string", "null"]
+        peakHour:
+          type: ["integer", "null"]
+        consistencyScore:
+          type: number
+        trends:
+          type: array
+          items:
+            type: string
+        suggestions:
+          type: array
+          items:
+            type: string
+
+    PersonaMessage:
+      type: object
+      required: [message, emotion, animation]
+      properties:
+        message:
+          type: string
+        emotion:
+          type: string
+          enum: [happy, excited, proud, thoughtful, encouraging, celebrating, warning]
+        animation:
+          type: string
+          enum: [bounce, wave, dance, thumbsup, sparkle, thinking]
+        tip:
+          type: ["string", "null"]
+
+    PersonaNotification:
+      type: object
+      required: [id, type, message, emotion, priority, createdAt]
+      properties:
+        id:
+          type: integer
+        type:
+          type: string
+          enum: [streak_at_risk, trading_opportunity, milestone_close, encouragement, deal_alert]
+        message:
+          type: string
+        emotion:
+          type: string
+          enum: [happy, excited, proud, thoughtful, encouraging, celebrating, warning]
+        priority:
+          type: string
+          enum: [low, medium, high]
+        read:
+          type: boolean
+        createdAt:
+          type: string

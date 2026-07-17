@@ -1,0 +1,16 @@
+{
+  "version": 2,
+  "name": "tradeup",
+  "buildCommand": "pnpm install --ignore-scripts && BASE_PATH=/ pnpm --filter @workspace/life-os run build",
+  "outputDirectory": "artifacts/life-os/dist/public",
+  "framework": null,
+  "rewrites": [],
+  "headers": [
+    {
+      "source": "/(.*)",
+      "headers": [
+        { "key": "X-Frame-Options", "value": "DENY" }
+      ]
+    }
+  ]
+}

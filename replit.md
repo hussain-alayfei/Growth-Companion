@@ -1,45 +1,43 @@
-# [Project name]
+# TradeUP
 
-_Replace the heading above with the project's name, and this line with one sentence describing what this app does for users._
+Arabic-first mobile trading education simulator with paper trading, gamification, and an OpenAI-powered philosophy coach (Lumi UI + selectable coach personas).
 
 ## Run & Operate
 
-- `pnpm --filter @workspace/api-server run dev` — run the API server (port 5000)
-- `pnpm run typecheck` — full typecheck across all packages
-- `pnpm run build` — typecheck + build all packages
-- `pnpm --filter @workspace/api-spec run codegen` — regenerate API hooks and Zod schemas from the OpenAPI spec
-- `pnpm --filter @workspace/db run push` — push DB schema changes (dev only)
-- Required env: `DATABASE_URL` — Postgres connection string
+- `pnpm --filter @workspace/life-os run dev` — frontend
+- `pnpm --filter @workspace/api-server run dev` — API (port 8080)
+- `pnpm run typecheck` — full typecheck
+- `pnpm run build` — typecheck + build
+- `pnpm --filter @workspace/api-spec run codegen` — regenerate hooks/Zod from OpenAPI
+- `pnpm --filter @workspace/db run push` — push DB schema (dev)
+
+### Required env
+
+| Variable | Purpose |
+|----------|---------|
+| `DATABASE_URL` | Postgres connection string |
+| `OPENAI_API_KEY` | OpenAI API key for gpt-4o-mini coaching |
+| `OPENAI_MODEL` | Optional, default `gpt-4o-mini` |
 
 ## Stack
 
-- pnpm workspaces, Node.js 24, TypeScript 5.9
-- API: Express 5
+- pnpm workspaces, TypeScript 5.9
+- Frontend: React + Vite, Framer Motion, Recharts, Tailwind CSS v4, Wouter
+- API: Express 5 + OpenAI SDK
 - DB: PostgreSQL + Drizzle ORM
-- Validation: Zod (`zod/v4`), `drizzle-zod`
-- API codegen: Orval (from OpenAPI spec)
-- Build: esbuild (CJS bundle)
+- API codegen: Orval from `lib/api-spec/openapi.yaml`
 
-## Where things live
+## Product surfaces
 
-_Populate as you build — short repo map plus pointers to the source-of-truth file for DB schema, API contracts, theme files, etc._
+- **Home**: XP, trade streak, portfolio, coach CTA
+- **Trading**: Portfolio, market, buy/sell with AI preview + confirm, session review
+- **Education**: Static Arabic curriculum
+- **AI Coach**: Chat with history, 4 philosophy personas, session review
+- **Progress**: Streaks, badges, trade counts
 
-## Architecture decisions
+## Architecture notes
 
-_Populate as you build — non-obvious choices a reader couldn't infer from the code (3-5 bullets)._
-
-## Product
-
-_Describe the high-level user-facing capabilities of this app once they exist._
-
-## User preferences
-
-_Populate as you build — explicit user instructions worth remembering across sessions._
-
-## Gotchas
-
-_Populate as you build — sharp edges, "always run X before Y" rules._
-
-## Pointers
-
-- See the `pnpm-workspace` skill for workspace structure, TypeScript setup, and package details
+- Single user (`user_id = 1`) for personal demo
+- Simulated prices (seeded random walk)
+- Coach never hard-blocks trades; high risk requires `confirmed: true`
+- Structured JSON via OpenAI `response_format: json_schema`
