@@ -14,6 +14,7 @@ import { Send, Loader2, ArrowRight, ClipboardList, Sun, Moon } from "lucide-reac
 import { motion, AnimatePresence } from "framer-motion";
 import { Link } from "wouter";
 import { useAppTheme } from "@/hooks/use-app-theme";
+import { MarkdownMessage } from "@/components/ui/markdown-message";
 
 interface Message {
   id: string;
@@ -233,7 +234,11 @@ export default function Coach() {
                 }`}
                 style={{ direction: "rtl" }}
               >
-                <p className="text-sm leading-relaxed">{msg.content}</p>
+                {msg.role === "coach" ? (
+                  <MarkdownMessage content={msg.content} />
+                ) : (
+                  <p className="text-sm leading-relaxed">{msg.content}</p>
+                )}
               </motion.div>
             ))}
 
@@ -260,7 +265,9 @@ export default function Coach() {
               style={{ direction: "rtl" }}
             >
               <h3 className="font-bold mb-2">مراجعة الجلسة</h3>
-              <p className="text-sm mb-3 leading-relaxed">{sessionReview.summary}</p>
+              <div className="mb-3">
+                <MarkdownMessage content={sessionReview.summary} />
+              </div>
               <p className="text-xs text-primary mb-2">التوافق: {Math.round(sessionReview.alignmentScore)}%</p>
               <div className="text-xs space-y-2">
                 <div>

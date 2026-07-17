@@ -56,14 +56,29 @@ export const OPENAI_SCHEMAS = {
       additionalProperties: false,
       required: ["message", "suggestions", "personaEmotion", "learnMore", "refs"],
       properties: {
-        message: { type: "string" },
-        suggestions: { type: "array", items: { type: "string" } },
+        message: {
+          type: "string",
+          description:
+            "Markdown-formatted Arabic answer: short intro paragraph, then bullet points for multiple items. Bold only key terms. 3-6 sentences/points total.",
+        },
+        suggestions: {
+          type: "array",
+          items: { type: "string" },
+          description: "2-4 short Arabic follow-up question chips, each under 8 words, no markdown.",
+        },
         personaEmotion: {
           type: "string",
           enum: ["thinking", "excited", "cautious", "proud", "teaching"],
         },
-        learnMore: { type: ["string", "null"] },
-        refs: { type: "array", items: { type: "string" } },
+        learnMore: {
+          type: ["string", "null"],
+          description: "Optional single-sentence deeper insight, plain text, no markdown.",
+        },
+        refs: {
+          type: "array",
+          items: { type: "string" },
+          description: "0-3 short Arabic concept names referenced (plain text, no markdown, no URLs).",
+        },
       },
     },
   },
@@ -85,11 +100,26 @@ export const OPENAI_SCHEMAS = {
       properties: {
         riskLevel: { type: "string", enum: ["low", "moderate", "high", "extreme"] },
         requiresConfirm: { type: "boolean" },
-        warning: { type: ["string", "null"] },
-        coachFeedback: { type: "string" },
+        warning: {
+          type: ["string", "null"],
+          description: "Plain-text single-sentence Arabic warning if risky, otherwise null.",
+        },
+        coachFeedback: {
+          type: "string",
+          description:
+            "Markdown-formatted Arabic feedback from the coach's philosophy: 1 short intro sentence, then 2-4 bullet points covering position sizing and reasoning fit.",
+        },
         alignmentScore: { type: "number" },
-        philosophyNotes: { type: "array", items: { type: "string" } },
-        questionsForUser: { type: "array", items: { type: "string" } },
+        philosophyNotes: {
+          type: "array",
+          items: { type: "string" },
+          description: "2-3 short plain-text Arabic notes on how well this trade fits the coach's philosophy.",
+        },
+        questionsForUser: {
+          type: "array",
+          items: { type: "string" },
+          description: "2-3 short plain-text Arabic reflective questions for the user to answer before confirming.",
+        },
       },
     },
   },
@@ -101,7 +131,11 @@ export const OPENAI_SCHEMAS = {
       additionalProperties: false,
       required: ["coachFeedback", "riskLevel", "warning"],
       properties: {
-        coachFeedback: { type: "string" },
+        coachFeedback: {
+          type: "string",
+          description:
+            "Markdown-formatted Arabic post-trade commentary from the coach's philosophy: 2-4 sentences or bullet points, calm and reflective, no direct orders.",
+        },
         riskLevel: { type: "string", enum: ["low", "moderate", "high", "extreme"] },
         warning: { type: ["string", "null"] },
       },
@@ -122,11 +156,26 @@ export const OPENAI_SCHEMAS = {
         "personaEmotion",
       ],
       properties: {
-        summary: { type: "string" },
+        summary: {
+          type: "string",
+          description:
+            "Markdown-formatted Arabic session summary: 1-2 short paragraphs, calm tone, from the coach's philosophy perspective.",
+        },
         alignmentScore: { type: "number" },
-        whatWentWell: { type: "array", items: { type: "string" } },
-        whatToImprove: { type: "array", items: { type: "string" } },
-        nextPractice: { type: "string" },
+        whatWentWell: {
+          type: "array",
+          items: { type: "string" },
+          description: "2-3 short plain-text Arabic positives, no markdown.",
+        },
+        whatToImprove: {
+          type: "array",
+          items: { type: "string" },
+          description: "2-3 short plain-text Arabic improvement points, no markdown.",
+        },
+        nextPractice: {
+          type: "string",
+          description: "One concrete, short plain-text Arabic practice suggestion for the next session.",
+        },
         personaEmotion: { type: "string", enum: ["proud", "thoughtful", "cautious"] },
       },
     },
@@ -139,10 +188,24 @@ export const OPENAI_SCHEMAS = {
       additionalProperties: false,
       required: ["brief", "keyPoints", "risks", "educationalNote"],
       properties: {
-        brief: { type: "string" },
-        keyPoints: { type: "array", items: { type: "string" } },
-        risks: { type: "array", items: { type: "string" } },
-        educationalNote: { type: "string" },
+        brief: {
+          type: "string",
+          description: "1-2 short plain-text Arabic sentences describing the company/stock, educational only.",
+        },
+        keyPoints: {
+          type: "array",
+          items: { type: "string" },
+          description: "2-4 short plain-text Arabic educational points about this stock, no markdown.",
+        },
+        risks: {
+          type: "array",
+          items: { type: "string" },
+          description: "2-3 short plain-text Arabic risk factors, no markdown.",
+        },
+        educationalNote: {
+          type: "string",
+          description: "One short plain-text Arabic disclaimer that this is educational, not a recommendation.",
+        },
       },
     },
   },

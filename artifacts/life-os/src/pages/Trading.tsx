@@ -25,6 +25,7 @@ import {
 } from "lucide-react";
 import { useState, useMemo } from "react";
 import { motion, AnimatePresence } from "framer-motion";
+import { MarkdownMessage } from "@/components/ui/markdown-message";
 
 const generateSparkline = (start: number, end: number) => {
   const data = [];
@@ -268,9 +269,9 @@ export default function Trading() {
         )}
 
         {lastFeedback && (
-          <div className="bg-primary/10 border border-primary/25 rounded-2xl p-4 text-sm leading-relaxed" style={{ direction: "rtl" }}>
+          <div className="bg-primary/10 border border-primary/25 rounded-2xl p-4" style={{ direction: "rtl" }}>
             <p className="text-xs font-bold text-primary mb-1">تعليق المدرب</p>
-            {lastFeedback}
+            <MarkdownMessage content={lastFeedback} />
             <button onClick={() => setLastFeedback(null)} className="block mt-2 text-xs text-muted-foreground underline">
               إغلاق
             </button>
@@ -280,7 +281,9 @@ export default function Trading() {
         {sessionReview && (
           <div className="bg-card border border-card-border rounded-2xl p-4 text-sm" style={{ direction: "rtl" }}>
             <h3 className="font-bold mb-2">مراجعة الجلسة</h3>
-            <p className="mb-2">{sessionReview.summary}</p>
+            <div className="mb-2">
+              <MarkdownMessage content={sessionReview.summary} />
+            </div>
             <p className="text-xs text-primary mb-2">التوافق: {Math.round(sessionReview.alignmentScore)}%</p>
             <p className="text-xs text-muted-foreground">{sessionReview.nextPractice}</p>
             <button onClick={() => setSessionReview(null)} className="mt-2 text-xs underline text-muted-foreground">
@@ -448,9 +451,9 @@ export default function Trading() {
                   معاينة مع المدرب ثم تنفيذ
                 </button>
                 {preview && !confirmOpen && (
-                  <div className="text-xs bg-secondary/60 rounded-xl p-3 space-y-1">
-                    <p>الخطر: {preview.riskLevel}</p>
-                    <p>{preview.coachFeedback}</p>
+                  <div className="text-xs bg-secondary/60 rounded-xl p-3 space-y-1" style={{ direction: "rtl" }}>
+                    <p className="font-bold text-primary">الخطر: {preview.riskLevel}</p>
+                    <MarkdownMessage content={preview.coachFeedback} className="text-xs" />
                   </div>
                 )}
               </div>
@@ -526,7 +529,7 @@ export default function Trading() {
             >
               <h3 className="text-xl font-bold">المدرب يحذّر — هل تؤكد؟</h3>
               <p className="text-sm text-amber-300">{preview.warning || "صفقة ذات مخاطر مرتفعة نسبياً."}</p>
-              <p className="text-sm leading-relaxed">{preview.coachFeedback}</p>
+              <MarkdownMessage content={preview.coachFeedback} />
               <ul className="text-xs text-muted-foreground list-disc mr-4 space-y-1">
                 {preview.questionsForUser.map((q) => (
                   <li key={q}>{q}</li>

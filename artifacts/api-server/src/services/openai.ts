@@ -79,9 +79,9 @@ export async function getCoachAdvice(params: {
 
   const fallback: CoachAdviceJson = {
     message:
-      "عذراً، المدرب الذكي غير متاح حالياً. تأكد من إعداد مفتاح OpenAI، ويمكنك متابعة التعلم من قسم التعليم والمحفظة المحاكاة.",
+      "**المدرب الذكي غير متاح حالياً.**\n\nيمكنك مع ذلك الاستمرار في التعلم:\n\n- راجع درساً في قسم **التعليم**\n- افتح المحفظة المحاكاة وتصفّح الأسهم المتاحة\n- أعد المحاولة بعد قليل",
     suggestions: [
-      "راجع درساً في التحليل الفني أو إدارة المخاطر",
+      "راجع درساً في إدارة المخاطر",
       "اطلب معاينة صفقة قبل التنفيذ",
       "جرّب مراجعة الجلسة بعد التداول",
     ],
@@ -135,7 +135,7 @@ export async function getTradePreview(params: {
     warning: heuristicConfirm
       ? `هذه الصفقة تمثل حوالي ${params.tradePercent.toFixed(0)}% من المحفظة — راجع حجم المركز.`
       : null,
-    coachFeedback: `معاينة ${params.type === "buy" ? "شراء" : "بيع"} ${params.shares} من ${params.symbol} بسعر ~${params.price.toFixed(2)}. فكّر: هل الحجم مناسب لفلسفتك؟`,
+    coachFeedback: `معاينة **${params.type === "buy" ? "شراء" : "بيع"} ${params.shares}** من **${params.symbol}** بسعر ~$${params.price.toFixed(2)}.\n\n- هذا يمثل نحو **${params.tradePercent.toFixed(0)}%** من محفظتك\n- فكّر: هل الحجم مناسب لفلسفتك الاستثمارية؟`,
     alignmentScore: heuristicRisk === "low" ? 75 : heuristicRisk === "moderate" ? 55 : 35,
     philosophyNotes: ["راجع تحجيم المركز قبل التنفيذ.", "لا تمنع الصفقة — لكن تأكد أن لديك سبباً واضحاً."],
     questionsForUser: ["ما فرضيتك لهذه الصفقة؟", "أين وقف الخسارة الذهني؟"],
@@ -176,7 +176,7 @@ export async function getPostTradeCommentary(params: {
     params.tradePercent > 40 ? "extreme" : params.tradePercent > 25 ? "high" : params.tradePercent > 10 ? "moderate" : "low";
 
   const fallback: PostTradeJson = {
-    coachFeedback: `تم تنفيذ ${params.type === "buy" ? "شراء" : "بيع"} ${params.symbol}. راجع قرارك: هل كان الحجم متوافقاً مع خطتك؟`,
+    coachFeedback: `تم تنفيذ **${params.type === "buy" ? "شراء" : "بيع"} ${params.symbol}**.\n\nراجع قرارك: هل كان الحجم متوافقاً مع خطتك؟`,
     riskLevel,
     warning: riskLevel === "high" || riskLevel === "extreme" ? "حجم المركز مرتفع نسبياً — راقب المخاطر." : null,
   };
@@ -202,8 +202,8 @@ export async function getSessionReview(params: {
   const fallback: SessionReviewJson = {
     summary:
       params.orders.length === 0
-        ? "لم تنفّذ صفقات في هذه الجلسة. الجلسة الهادئة أيضاً قرار — استخدم الوقت للمراجعة والتعلم."
-        : `راجعت ${params.orders.length} صفقة/صفقات. ركّز على العملية أكثر من النتيجة قصيرة المدى.`,
+        ? "لم تنفّذ صفقات في هذه الجلسة.\n\nالجلسة الهادئة أيضاً قرار — استخدم الوقت للمراجعة والتعلم."
+        : `راجعت **${params.orders.length}** صفقة/صفقات في هذه الجلسة.\n\nركّز على **العملية** أكثر من النتيجة قصيرة المدى.`,
     alignmentScore: params.orders.length === 0 ? 70 : 60,
     whatWentWell: ["حضورك للتعلم", "استخدام المحاكاة بدل المخاطرة بأموال حقيقية"],
     whatToImprove: ["وضّح فرضية كل صفقة قبل التنفيذ", "اربط الحجم بتحمل المخاطر"],
