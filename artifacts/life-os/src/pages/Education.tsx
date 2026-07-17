@@ -1,5 +1,6 @@
 import { AppLayout } from "@/components/layout/AppLayout";
 import { Lumi } from "@/components/persona/Lumi";
+import { DailyQuiz } from "@/components/education/DailyQuiz";
 import { useState } from "react";
 import { motion, AnimatePresence } from "framer-motion";
 import { ChevronDown, ExternalLink, BookOpen, TrendingUp, Shield, BarChart3, Brain, GraduationCap } from "lucide-react";
@@ -316,6 +317,8 @@ export default function Education() {
             ))}
           </div>
         </div>
+
+        <DailyQuiz />
 
         {/* Category filter pills */}
         <div className="flex gap-2 overflow-x-auto no-scrollbar pb-1" style={{ direction: "ltr" }}>

@@ -7,7 +7,17 @@ import {
   getGetRecentActivityQueryKey,
 } from "@workspace/api-client-react";
 import { motion } from "framer-motion";
-import { Flame, LineChart, GraduationCap, MessageCircle } from "lucide-react";
+import {
+  Flame,
+  LineChart,
+  GraduationCap,
+  MessageCircle,
+  TrendingUp,
+  TrendingDown,
+  Star,
+  Sparkles,
+  type LucideIcon,
+} from "lucide-react";
 import { Link } from "wouter";
 
 const COACH_LABELS: Record<string, string> = {
@@ -16,6 +26,20 @@ const COACH_LABELS: Record<string, string> = {
   risk: "حارس المخاطر",
   technical: "قارئ الشارت",
 };
+
+const ACTIVITY_ICONS: Record<string, LucideIcon> = {
+  "trending-up": TrendingUp,
+  "trending-down": TrendingDown,
+  "graduation-cap": GraduationCap,
+  flame: Flame,
+  star: Star,
+  sparkles: Sparkles,
+};
+
+function ActivityIcon({ name }: { name?: string | null }) {
+  const Icon = (name && ACTIVITY_ICONS[name]) || Sparkles;
+  return <Icon className="w-5 h-5 text-primary" aria-hidden />;
+}
 
 export default function Home() {
   const { data: summary, isLoading: loadingSummary } = useGetDashboardSummary({
@@ -150,17 +174,22 @@ export default function Home() {
           <h3 className="text-lg font-bold">النشاط الأخير</h3>
           <div className="flex flex-col gap-3">
             {activity?.map((item) => (
-              <div key={item.id} className="bg-card border border-card-border rounded-2xl p-4 flex items-center justify-between">
-                <div className="flex items-center gap-3">
-                  <div className="w-10 h-10 rounded-full bg-secondary flex items-center justify-center text-xl flex-shrink-0">
-                    {item.icon || "✨"}
-                  </div>
-                  <div>
-                    <h4 className="font-medium text-sm">{item.title}</h4>
-                    <p className="text-xs text-muted-foreground">{item.description}</p>
-                  </div>
+              <div
+                key={item.id}
+                className="bg-card border border-card-border rounded-2xl p-4 flex items-center gap-3 min-w-0"
+              >
+                <div className="w-10 h-10 rounded-full bg-secondary flex items-center justify-center shrink-0">
+                  <ActivityIcon name={item.icon} />
                 </div>
-                <div className="text-sm font-bold text-orange-400 shrink-0 mr-2">+{item.xpGained} XP</div>
+                <div className="min-w-0 flex-1">
+                  <h4 className="font-medium text-sm truncate">{item.title}</h4>
+                  <p className="text-xs text-muted-foreground truncate">{item.description}</p>
+                </div>
+                {item.xpGained > 0 && (
+                  <div className="text-sm font-bold text-orange-400 shrink-0 whitespace-nowrap">
+                    +{item.xpGained} XP
+                  </div>
+                )}
               </div>
             ))}
             {(!activity || activity.length === 0) && (
