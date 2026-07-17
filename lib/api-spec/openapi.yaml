@@ -469,7 +469,7 @@ components:
         sector:
           type: string
         marketCap:
-          type: string
+          type: ["string", "null"]
         description:
           type: ["string", "null"]
         aiRating:

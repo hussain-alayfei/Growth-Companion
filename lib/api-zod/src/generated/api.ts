@@ -50,7 +50,7 @@ export const GetStocksResponseItem = zod.object({
   "change": zod.number(),
   "changePercent": zod.number(),
   "sector": zod.string(),
-  "marketCap": zod.string().optional(),
+  "marketCap": zod.string().nullish(),
   "description": zod.string().nullish(),
   "aiRating": zod.union([zod.literal('strong_buy'),zod.literal('buy'),zod.literal('hold'),zod.literal('sell'),zod.literal('strong_sell'),zod.literal(null)]).nullish()
 })

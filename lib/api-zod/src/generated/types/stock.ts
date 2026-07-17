@@ -14,7 +14,8 @@ export interface Stock {
   change: number;
   changePercent: number;
   sector: string;
-  marketCap?: string;
+  /** @nullable */
+  marketCap?: string | null;
   /** @nullable */
   description?: string | null;
   /** @nullable */
