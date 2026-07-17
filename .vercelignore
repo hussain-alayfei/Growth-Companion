@@ -1,0 +1,17 @@
+node_modules
+**/node_modules
+.pnpm-store
+dist
+**/dist
+.git
+.local
+.cache
+.env
+.env.*
+!.env.example
+*.log
+artifacts/mockup-sandbox
+artifacts/api-server/dist
+attached_assets
+.replit
+**/.replit-artifact
