@@ -4,6 +4,7 @@
 @plugin "@tailwindcss/typography";
 
 @custom-variant dark (&:is(.dark *));
+@custom-variant light (&:is(.light *));
 
 @theme inline {
   --color-background: hsl(var(--background));
@@ -117,6 +118,38 @@
   
   --input: 240 25% 16%;
   --ring: 243 100% 69%;
+}
+
+.light {
+  --background: 0 0% 100%; /* pure white */
+  --foreground: 240 27% 10%;
+  --border: 220 20% 90%;
+
+  --card: 0 0% 100%;
+  --card-foreground: 240 27% 10%;
+  --card-border: 220 20% 88%;
+
+  --popover: 0 0% 100%;
+  --popover-foreground: 240 27% 10%;
+  --popover-border: 220 20% 88%;
+
+  --primary: 243 85% 60%; /* slightly deeper for contrast on white */
+  --primary-foreground: 0 0% 100%;
+
+  --secondary: 220 25% 96%;
+  --secondary-foreground: 240 27% 12%;
+
+  --muted: 220 25% 95%;
+  --muted-foreground: 220 15% 40%;
+
+  --accent: 258 80% 58%;
+  --accent-foreground: 0 0% 100%;
+
+  --destructive: 350 80% 52%;
+  --destructive-foreground: 0 0% 100%;
+
+  --input: 220 20% 92%;
+  --ring: 243 85% 60%;
 }
 
 @layer base {

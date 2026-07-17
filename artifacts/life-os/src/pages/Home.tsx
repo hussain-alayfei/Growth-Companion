@@ -76,7 +76,7 @@ export default function Home() {
           <div className="relative z-10 flex items-center gap-4">
             <Lumi emotion="happy" size={72} />
             <div>
-              <h3 className="text-lg font-medium text-white mb-1">
+              <h3 className="text-lg font-medium text-foreground mb-1">
                 {summary?.personaMessage || "مستعد لجلسة تداول تعليمية؟"}
               </h3>
               <p className="text-xs text-muted-foreground">مدربك: {COACH_LABELS[coachId] || coachId}</p>

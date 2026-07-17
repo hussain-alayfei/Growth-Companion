@@ -19,6 +19,17 @@
     <style>
       * { font-family: 'Cairo', sans-serif; }
     </style>
+    <script>
+      (function () {
+        try {
+          var theme = localStorage.getItem('tradeup-theme');
+          if (theme !== 'light' && theme !== 'dark') theme = 'dark';
+          var root = document.documentElement;
+          root.classList.add(theme);
+          root.style.colorScheme = theme;
+        } catch (e) {}
+      })();
+    </script>
   </head>
   <body>
     <div id="root"></div>

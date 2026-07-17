@@ -1,6 +1,7 @@
 import { Link, useLocation } from "wouter";
-import { Home, LineChart, Target, MessageCircle, GraduationCap } from "lucide-react";
+import { Home, LineChart, Target, MessageCircle, GraduationCap, Sun, Moon } from "lucide-react";
 import { cn } from "@/lib/utils";
+import { useAppTheme } from "@/hooks/use-app-theme";
 
 interface AppLayoutProps {
   children: React.ReactNode;
@@ -8,6 +9,7 @@ interface AppLayoutProps {
 
 export function AppLayout({ children }: AppLayoutProps) {
   const [location] = useLocation();
+  const { theme, toggleTheme } = useAppTheme();
 
   const navItems = [
     { path: "/", icon: Home, label: "الرئيسية" },
@@ -17,8 +19,21 @@ export function AppLayout({ children }: AppLayoutProps) {
   ];
 
   return (
-    <div className="flex justify-center w-full min-h-[100dvh] bg-black">
+    <div className="flex justify-center w-full min-h-[100dvh] bg-black light:bg-slate-100 transition-colors">
       <div className="w-full max-w-[430px] bg-background relative flex flex-col min-h-[100dvh] overflow-hidden shadow-2xl">
+        <button
+          onClick={toggleTheme}
+          className="absolute top-4 left-4 z-50 w-10 h-10 rounded-full bg-card/80 backdrop-blur-xl border border-card-border flex items-center justify-center shadow-lg hover:scale-105 transition-transform"
+          title={theme === "dark" ? "تفعيل الوضع الفاتح" : "تفعيل الوضع الداكن"}
+          aria-label="تبديل المظهر"
+        >
+          {theme === "dark" ? (
+            <Sun className="w-4 h-4 text-amber-400" />
+          ) : (
+            <Moon className="w-4 h-4 text-primary" />
+          )}
+        </button>
+
         <main className="flex-1 overflow-y-auto pb-24 no-scrollbar">
           {children}
         </main>

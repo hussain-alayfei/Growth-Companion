@@ -10,9 +10,10 @@ import {
 } from "@workspace/api-client-react";
 import { useQueryClient } from "@tanstack/react-query";
 import { useState, useRef, useEffect } from "react";
-import { Send, Loader2, ArrowRight, ClipboardList } from "lucide-react";
+import { Send, Loader2, ArrowRight, ClipboardList, Sun, Moon } from "lucide-react";
 import { motion, AnimatePresence } from "framer-motion";
 import { Link } from "wouter";
+import { useAppTheme } from "@/hooks/use-app-theme";
 
 interface Message {
   id: string;
@@ -51,6 +52,7 @@ export default function Coach() {
   const updateCoach = useUpdateSelectedCoach();
   const reviewMutation = useReviewTradingSession();
   const coachMutation = useGetCoachAdvice();
+  const { theme, toggleTheme } = useAppTheme();
 
   const selectedCoachId = profile?.selectedCoachId || "value";
   const [messages, setMessages] = useState<Message[]>([
@@ -167,7 +169,7 @@ export default function Coach() {
       : "idle";
 
   return (
-    <div className="flex justify-center w-full min-h-[100dvh] bg-black">
+    <div className="flex justify-center w-full min-h-[100dvh] bg-black light:bg-slate-100 transition-colors">
       <div className="w-full max-w-[430px] bg-background relative flex flex-col min-h-[100dvh] overflow-hidden shadow-2xl">
         <header className="sticky top-0 z-50 bg-background/80 backdrop-blur-xl border-b border-card-border p-4 pt-6">
           <div className="flex items-center gap-3 mb-3">
@@ -181,6 +183,14 @@ export default function Coach() {
                 {COACHES.find((c) => c.id === selectedCoachId)?.name || "اختر مدرباً"}
               </p>
             </div>
+            <button
+              onClick={toggleTheme}
+              className="p-2 rounded-full bg-secondary text-muted-foreground hover:text-primary"
+              title={theme === "dark" ? "تفعيل الوضع الفاتح" : "تفعيل الوضع الداكن"}
+              aria-label="تبديل المظهر"
+            >
+              {theme === "dark" ? <Sun className="w-5 h-5" /> : <Moon className="w-5 h-5" />}
+            </button>
             <button
               onClick={handleSessionReview}
               disabled={reviewMutation.isPending}

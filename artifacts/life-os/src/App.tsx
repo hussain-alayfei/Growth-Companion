@@ -24,7 +24,7 @@ function Router() {
       <Route path="/progress" component={Progress} />
       <Route path="/education" component={Education} />
       <Route>
-        <div className="min-h-screen flex items-center justify-center text-white bg-black">
+        <div className="min-h-screen flex items-center justify-center text-foreground bg-background">
           <h1>٤٠٤ - الصفحة غير موجودة</h1>
         </div>
       </Route>
