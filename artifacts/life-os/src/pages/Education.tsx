@@ -298,10 +298,13 @@ export default function Education() {
         <header className="flex items-start gap-4">
           <div>
             <h1 className="text-3xl font-bold mb-1">التعليم</h1>
-            <p className="text-muted-foreground text-sm">{totalLessons} درساً من أفضل المصادر العالمية</p>
+            <p className="text-muted-foreground text-sm">مسار تفاعلي + دروس من مصادر عالمية</p>
           </div>
           <Lumi emotion="proud" size={56} />
         </header>
+
+        {/* Duolingo-style level path */}
+        <DailyQuiz />
 
         {/* Trusted sources banner */}
         <div className="bg-gradient-to-br from-primary/10 to-transparent border border-primary/20 rounded-3xl p-4">
@@ -317,8 +320,6 @@ export default function Education() {
             ))}
           </div>
         </div>
-
-        <DailyQuiz />
 
         {/* Category filter pills */}
         <div className="flex gap-2 overflow-x-auto no-scrollbar pb-1" style={{ direction: "ltr" }}>
